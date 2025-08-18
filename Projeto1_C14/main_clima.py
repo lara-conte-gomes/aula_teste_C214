@@ -33,9 +33,8 @@ def obter_clima_atual(cidade):
     #Função padrão para coletar os dados da saída
     if resposta.status_code == 200:
         dados = resposta.json()
-        temperatura = dados['main']['temp']
         descricao = dados['weather'][0]['description']
-        return temperatura, descricao
+        return descricao
     else:
         return None, None
 
