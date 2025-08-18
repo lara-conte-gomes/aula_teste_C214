@@ -38,3 +38,11 @@ source .venv/bin/activate
 
 # instalar dependências
 pip install -r requirements.txt
+
+## Atualizações Gabriel: ##
+
+-Foi incluído um arquivo .env que contém a chave da API. Dessa forma, o código fica dinâmico utilizando uma chave ativa. Caso haja necessidade, é só alterar o arquivo;
+-Sugestão: Validar o git.ignore, pois o mesmo pode estar ignorando o .env;
+-Comentei o print que mostrava a chave da API, visando deixar a saída mais fluída e limpa;
+
+
