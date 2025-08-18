@@ -17,7 +17,7 @@ API_KEY = os.getenv("OPENWEATHER_API_KEY")
 BASE_URL = "http://api.openweathermap.org/data/2.5/weather?"
 
 #Consultando o clima
-def obter_clima(cidade):
+def obter_clima_atual(cidade):
     cidade_codificada = quote_plus(cidade)  #Codificando a cidade
     url = f"{BASE_URL}q={cidade_codificada}&appid={API_KEY}&units=metric&lang=pt_br"
 
