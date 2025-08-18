@@ -11,7 +11,7 @@ load_dotenv()
 API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
 #Verificando a chave da API
-print(f"Chave da API: {API_KEY}")
+##print(f"Chave da API: {API_KEY}")
 
 #URL da API do OpenWeather
 BASE_URL = "http://api.openweathermap.org/data/2.5/weather?"
