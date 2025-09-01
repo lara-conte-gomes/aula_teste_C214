@@ -1,54 +1,40 @@
-import requests
-from dotenv import load_dotenv
 import os
-from rich.console import Console
-from urllib.parse import quote_plus  # Codificar a cidade pesquisada
+from urllib.parse import quote_plus
+import requests
+from typing import Tuple, Optional
 
-#Carregar variáveis de ambiente
-load_dotenv()
+BASE_URL = "http://api.openweathermap.org/data/2.5/weather"
 
-#Obter chave da API do arquivo .env
-API_KEY = os.getenv("OPENWEATHER_API_KEY")
+def obter_clima_atual(cidade: str, *, timeout: int = 10) -> Tuple[Optional[float], Optional[str]]:
+    """
+    Retorna (temperatura_em_celsius, descricao) ou (None, None) em caso de erro.
+    """
+    api_key = os.getenv("OPENWEATHER_API_KEY")
+    if not api_key:
+        return (None, None)
 
-#Verificando a chave da API
-##print(f"Chave da API: {API_KEY}")
+    try:
+        q = quote_plus(cidade)  # codifica acentos e espaços
+        url = f"{BASE_URL}?q={q}&appid={api_key}&units=metric&lang=pt_br"
 
-#URL da API do OpenWeather
-BASE_URL = "http://api.openweathermap.org/data/2.5/weather?"
+        resp = requests.get(url, timeout=timeout)
 
-#Consultando o clima
-def obter_clima_atual(cidade):
-    cidade_codificada = quote_plus(cidade)  #Codificando a cidade
-    url = f"{BASE_URL}q={cidade_codificada}&appid={API_KEY}&units=metric&lang=pt_br"
+        # Qualquer 4xx/5xx -> erro
+        if resp.status_code >= 400:
+            return (None, None)
 
-    #Print para verificar a URL gerada
-    print(f"URL gerada: {url}")
+        data = resp.json()
 
-    resposta = requests.get(url)
+        main = data.get("main") or {}
+        weather = data.get("weather") or []
 
-    #Saída de dados
-    print(f"Código de status: {resposta.status_code}")  # Imprime o código de status
-    print(f"Conteúdo da resposta: {resposta.text}")  # Imprime a resposta completa
+        if "temp" not in main or not weather:
+            return (None, None)
 
-    #Função padrão para coletar os dados da saída
-    if resposta.status_code == 200:
-        dados = resposta.json()
-        descricao = dados['weather'][0]['description']
-        return descricao
-    else:
-        return None, None
+        temp = float(main["temp"])
+        desc = str(weather[0].get("description", ""))
 
-def main():
-    console = Console()
-    cidade = input("Digite o nome da cidade: ")
-
-    console.print("Consultando clima...", style="bold yellow")
-    temperatura, descricao = obter_clima(cidade)
-
-    if temperatura is not None:
-        console.print(f"O clima em {cidade} é {descricao} com uma temperatura de {temperatura}°C.", style="bold green")
-    else:
-        console.print(f"Não foi possível obter as informações de clima para {cidade}.", style="bold red")
-
-if __name__ == "__main__":
-    main()
+        return (temp, desc)
+    except Exception:
+        # Inclui: Timeout, ConnectionError, JSON inválido, etc.
+        return (None, None)
