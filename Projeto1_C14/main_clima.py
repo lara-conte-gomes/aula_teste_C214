@@ -17,7 +17,7 @@ def obter_clima_atual(cidade: str, *, timeout: int = 10) -> Tuple[Optional[float
         q = quote_plus(cidade)  # codifica acentos e espaços
         url = f"{BASE_URL}?q={q}&appid={api_key}&units=metric&lang=pt_br"
 
-        resp = requests.get(url)  # BUG proposital: sem timeout
+        resp = requests.get(url, timeout=timeout)  # BUG proposital: sem timeout
 
         # Qualquer 4xx/5xx -> erro
         if resp.status_code >= 400:
