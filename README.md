@@ -39,10 +39,50 @@ source .venv/bin/activate
 # instalar dependências
 pip install -r requirements.txt
 
-## Atualizações Gabriel: ##
+
 
 -Foi incluído um arquivo .env que contém a chave da API. Dessa forma, o código fica dinâmico utilizando uma chave ativa. Caso haja necessidade, é só alterar o arquivo;
 -Sugestão: Validar o git.ignore, pois o mesmo pode estar ignorando o .env;
 -Comentei o print que mostrava a chave da API, visando deixar a saída mais fluída e limpa;
+
+---
+
+## 🔎 Regressões simuladas e correções
+
+Como parte da atividade da disciplina, foram introduzidas regressões intencionais via **Pull Request (PR)** para validar a cobertura da suíte de testes.  
+
+### 🚨 Erros introduzidos
+
+1. **Remoção do parâmetro `timeout` em `requests.get`**
+   - **Alteração:**  
+     ```diff
+- resp = requests.get(url, timeout=10)
++ resp = requests.get(url)  # regressão proposital
+     ```
+   - **Efeito:** o teste `test_ok_timeout_param_enviado` falhou, pois esperava que o parâmetro `timeout` fosse usado.  
+   - **Resultado:** falha registrada no relatório do `pytest`.
+
+2. **Troca da chave `'temp'` por `'temperature'`**
+   - **Alteração:**  
+     ```diff
+- temperatura = dados.get("main", {}).get("temp")
++ temperatura = dados.get("main", {}).get("temperature")
+     ```
+   - **Efeito:** vários testes quebraram (`test_ok_retorna_tupla`, `test_ok_valores_corretos`, etc.), pois a função passou a retornar `None` em vez da temperatura correta.  
+
+---
+
+### ✅ Correções aplicadas
+
+- Reintroduzido o parâmetro `timeout=10` na chamada `requests.get`.  
+- Restaurada a chave correta `'temp'` no dicionário retornado pela API.  
+
+Após as correções, todos os testes passaram novamente:  
+
+```bash
+pytest -q
+# saída esperada
+....................   [20 passed]
+
 
 
